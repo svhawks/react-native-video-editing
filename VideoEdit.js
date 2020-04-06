@@ -18,8 +18,6 @@ const RNAVEditing = NativeModules.RNAVEditing;
 const VideoEditing = {
   deleteItem: function (path) {
     let srcObject = this.urlFilter(path);
-    console.log("working finre");
-    console.log(srcObject);
     RNAVEditing.deleteItem(srcObject);
   },
   urlFilter: function (src) {
@@ -92,7 +90,6 @@ const VideoEditing = {
   },
   TrimAudioVideo: function (option) {
     const videoObjectFromOption = this.getVideoObject(option);
-    //console.log(videoObject);
     const audioObjectFromOption = this.getAudioObject(option);
 
     let duration = this.duration(videoObjectFromOption.duration, audioObjectFromOption.duration);
@@ -103,7 +100,6 @@ const VideoEditing = {
 
     /* Video Object Filter */
     let videoObject = this.urlFilter(videoObjectFromOption.source);
-    console.log(videoObject);
     Object.assign(videoObject, {
       videoStartTime: this.startTime(videoObjectFromOption.startTime),
       duration,
@@ -125,7 +121,6 @@ const VideoEditing = {
           reject(onError);
         },
         (results, file) => {
-          console.log(file);
           resolve(file);
         }
       );
@@ -147,9 +142,7 @@ const VideoEditing = {
   },
   videoMotionFilter: function (option) {
     const videoObjectFromOption = this.getVideoObject(option);
-    //console.log(videoObject);
     const audioObjectFromOption = this.getAudioObject(option);
-    //console.log(this.getAudioMatched(videoObject,audioObject));
 
     let duration = this.duration(videoObjectFromOption.duration, audioObjectFromOption.duration);
 
@@ -182,7 +175,6 @@ const VideoEditing = {
           reject(onError);
         },
         (results, file) => {
-          console.log(file);
           resolve(file);
         }
       );
