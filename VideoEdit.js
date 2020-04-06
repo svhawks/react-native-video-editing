@@ -69,7 +69,7 @@ const VideoEditing = {
     /* Audio Object Filter */
     let audioObject = this.urlFilter(audio_object.source);
     Object.assign(audioObject,{
-      AudioStartTime:0.0,
+      AudioStartTime: audio_object.startTime,
       musicId: audio_object.musicId
     })
 
