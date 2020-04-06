@@ -53,7 +53,7 @@ RCT_EXPORT_METHOD(audioVideoSpeedFilter:(NSDictionary *)videoObject
   
   
   
-  CMTime start = CMTimeMakeWithSeconds([videoObject[@"VideoStartTime"] doubleValue], 600);
+  CMTime start = CMTimeMakeWithSeconds([videoObject[@"videoStartTime"] doubleValue], 600);
   CMTimeRange videoRange = CMTimeRangeMake(start, duration);
   
   [a_compositionVideoTrack insertTimeRange:videoRange ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:kCMTimeZero error:nil];
@@ -82,7 +82,7 @@ RCT_EXPORT_METHOD(audioVideoSpeedFilter:(NSDictionary *)videoObject
   
   //Now we are creating the first AVMutableCompositionTrack containing our audio and add it to our AVMutableComposition object.
   AVURLAsset *audioAsset = [self uriSource:audioObject];
-  start = CMTimeMakeWithSeconds([audioObject[@"AudioStartTime"] doubleValue], 600);
+  start = CMTimeMakeWithSeconds([audioObject[@"audioStartTime"] doubleValue], 600);
   
   AVMutableCompositionTrack *b_compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
   
@@ -171,14 +171,14 @@ RCT_EXPORT_METHOD(videoTriming:(NSDictionary *)videoObject
   if ([videoObject[@"duration"] doubleValue] == 0.0) {
     duration = videoAsset.duration;
   }else{
-    duration = CMTimeMakeWithSeconds([videoObject[@"Duration"] doubleValue], 600);
+    duration = CMTimeMakeWithSeconds([videoObject[@"duration"] doubleValue], 600);
   }
   
-  CMTime start = CMTimeMakeWithSeconds([videoObject[@"VideoStartTime"] doubleValue], 600);
+  CMTime start = CMTimeMakeWithSeconds([videoObject[@"videoStartTime"] doubleValue], 600);
   CMTimeRange videoRange = CMTimeRangeMake(start, duration);
   
   AVURLAsset *audioAsset = [self uriSource:audioObject];
-  start = CMTimeMakeWithSeconds([audioObject[@"AudioStartTime"] doubleValue], 600);
+  start = CMTimeMakeWithSeconds([audioObject[@"audioStartTime"] doubleValue], 600);
   CMTimeRange AudioRange = CMTimeRangeMake(start, duration);
   
   
