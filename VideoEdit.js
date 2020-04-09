@@ -5,8 +5,8 @@
  react-native-rnavediting
  deleteItem
  */
-'use strict';
-import { NativeModules } from 'react-native';
+"use strict";
+import { NativeModules } from "react-native";
 var resolveAssetSource = require("react-native/Libraries/Image/resolveAssetSource");
 
 const RNAVEditing = NativeModules.RNAVEditing;
@@ -16,192 +16,191 @@ const RNAVEditing = NativeModules.RNAVEditing;
  */
 
 const VideoEditing = {
-  deleteItem: function(path){
+  deleteItem: function (path) {
     let srcObject = this.urlFilter(path);
-    console.log('working finre');
-    console.log(srcObject)
     RNAVEditing.deleteItem(srcObject);
   },
-  urlFilter: function(src)  {
+  urlFilter: function (src) {
     const source = resolveAssetSource(src) || {};
 
-    let uri = source.uri || '';
+    let uri = source.uri || "";
     if (uri && uri.match(/^\//)) {
       uri = `file://${uri}`;
     }
 
     const isNetwork = !!(uri && uri.match(/^https?:/));
-    const isAsset = !!(uri && uri.match(/^(assets-library|file|content|ms-appx|ms-appdata|ipod-library):/));
+    const isAsset = !!(
+      uri &&
+      uri.match(
+        /^(assets-library|file|content|ms-appx|ms-appdata|ipod-library):/
+      )
+    );
     const srcObject = {
-      isNetwork:isNetwork,
-      isAsset:isAsset,
-      uri:uri,
-    }
+      isNetwork: isNetwork,
+      isAsset: isAsset,
+      uri: uri,
+    };
     return srcObject;
   },
-  getVideoQuality: function (quality = this.HIGH_QUALITY){
+  getVideoQuality: function (quality = this.HIGH_QUALITY) {
     return quality;
   },
-  getVideoFileLimit:function(limit = 0){
-    if(limit === 0){
-      return 0
+  getVideoFileLimit: function (limit = 0) {
+    if (limit === 0) {
+      return 0;
     }
-    return 1024*1024*limit;
+    return 1024 * 1024 * limit;
   },
-  MergeAudioVideo: function(option) {
+  MergeAudioVideo: function (option) {
     /* --- Getting Audio Video Object form Option --- */
-    const video_object = this.getVideoObject(option);
-    const audio_object = this.getAudioObject(option);
+    const videoObjectFromOption = this.getVideoObject(option);
+    const audioObjectFromOption = this.getAudioObject(option);
     /* --- Getting outPut video File size and quality */
     const videoQuality = this.getVideoQuality(option.videoQuality);
     const videoFileLimit = this.getVideoFileLimit(option.videoFileSizeLimit);
-    
 
     /* Video Object Filter */
-    let videoObject = this.urlFilter(video_object.source);
-    Object.assign(videoObject,{
-      VideoStartTime:0.0,
-      duration:0.0,
+    let videoObject = this.urlFilter(videoObjectFromOption.source);
+    Object.assign(videoObject, {
+      videoStartTime: 0.0,
+      duration: 0.0,
       videoFileLimit,
-      videoQuality
-    })
+      videoQuality,
+    });
 
     /* Audio Object Filter */
-    let audioObject = this.urlFilter(audio_object.source);
-    Object.assign(audioObject,{
-      AudioStartTime:0.0,
-    })
+    let audioObject = this.urlFilter(audioObjectFromOption.source);
+    Object.assign(audioObject, {
+      audioStartTime: audioObjectFromOption.startTime,
+      musicId: audioObjectFromOption.musicId,
+    });
 
-    return new Promise((resolve, reject)=>{
-        RNAVEditing.videoTriming(videoObject, audioObject,
-          (onError)=>{
-          reject(onError)
+    return new Promise((resolve, reject) => {
+      RNAVEditing.videoTriming(
+        videoObject,
+        audioObject,
+        (onError) => {
+          reject(onError);
         },
         (results, file) => {
-              resolve(file)
-            }
+          resolve(file);
+        }
       );
-      })
+    });
   },
-  TrimAudioVideo: function(option)  {
-      const video_object = this.getVideoObject(option);
-      //console.log(videoObject);
-      const audio_object = this.getAudioObject(option);
+  TrimAudioVideo: function (option) {
+    const videoObjectFromOption = this.getVideoObject(option);
+    const audioObjectFromOption = this.getAudioObject(option);
 
-      let duration = this.duration(video_object.duration,audio_object.duration);
+    let duration = this.duration(videoObjectFromOption.duration, audioObjectFromOption.duration);
 
-      /* --- Getting outPut video File size and quality */
-      const videoQuality = this.getVideoQuality(option.videoQuality);
-      const videoFileLimit = this.getVideoFileLimit(option.videoFileSizeLimit);
+    /* --- Getting outPut video File size and quality */
+    const videoQuality = this.getVideoQuality(option.videoQuality);
+    const videoFileLimit = this.getVideoFileLimit(option.videoFileSizeLimit);
 
-      /* Video Object Filter */
-      let videoObject = this.urlFilter(video_object.source);
-      console.log(videoObject);
-      Object.assign(videoObject,{
-        VideoStartTime:this.startTime(video_object.startTime),
-        duration,
-        videoQuality,
-        videoFileLimit
-      })
+    /* Video Object Filter */
+    let videoObject = this.urlFilter(videoObjectFromOption.source);
+    Object.assign(videoObject, {
+      videoStartTime: this.startTime(videoObjectFromOption.startTime),
+      duration,
+      videoQuality,
+      videoFileLimit,
+    });
 
-      /* Audio Object Filter */
-      let audioObject = this.urlFilter(audio_object.source);
-      Object.assign(audioObject,{
-        AudioStartTime:this.startTime(audio_object.startTime),
-      })
+    /* Audio Object Filter */
+    let audioObject = this.urlFilter(audioObjectFromOption.source);
+    Object.assign(audioObject, {
+      audioStartTime: this.startTime(audioObjectFromOption.startTime),
+    });
 
-      return new Promise((resolve, reject)=>{
-        RNAVEditing.videoTriming(videoObject, audioObject,
-          (onError)=>{
-          reject(onError)
+    return new Promise((resolve, reject) => {
+      RNAVEditing.videoTriming(
+        videoObject,
+        audioObject,
+        (onError) => {
+          reject(onError);
         },
         (results, file) => {
-              console.log(file);
-              resolve(file)
-            }
+          resolve(file);
+        }
       );
-      })
-      
+    });
   },
-  getVideoObject:function(option){
+  getVideoObject: function (option) {
     return option.video;
   },
-  getAudioObject:function(option){
-    if(option.audio){
+  getAudioObject: function (option) {
+    if (option.audio) {
       return option.audio;
-    }
-    else{
+    } else {
       let audio = {
-        source:option.video.source,
-        audioMatched:true,
-      }
+        source: option.video.source,
+        audioMatched: true,
+      };
       return audio;
     }
   },
-  videoMotionFilter: function(option)  {
+  videoMotionFilter: function (option) {
+    const videoObjectFromOption = this.getVideoObject(option);
+    const audioObjectFromOption = this.getAudioObject(option);
 
-    const video_object = this.getVideoObject(option);
-    //console.log(videoObject);
-    const audio_object = this.getAudioObject(option);
-    //console.log(this.getAudioMatched(videoObject,audioObject));
+    let duration = this.duration(videoObjectFromOption.duration, audioObjectFromOption.duration);
 
-      let duration = this.duration(video_object.duration,audio_object.duration);
+    /* --- Getting outPut video File size and quality */
+    const videoQuality = this.getVideoQuality(option.videoQuality);
+    const videoFileLimit = this.getVideoFileLimit(option.videoFileSizeLimit);
 
-      /* --- Getting outPut video File size and quality */
-      const videoQuality = this.getVideoQuality(option.videoQuality);
-      const videoFileLimit = this.getVideoFileLimit(option.videoFileSizeLimit);
+    /* Video Object Filter */
+    let videoObject = this.urlFilter(videoObjectFromOption.source);
 
-      /* Video Object Filter */
-      let videoObject = this.urlFilter(video_object.source);
+    Object.assign(videoObject, {
+      videoStartTime: this.startTime(videoObjectFromOption.startTime),
+      motion: this.getMotion(videoObjectFromOption.motion),
+      duration: duration,
+      audioMatched: this.getAudioMatched(option.audioMatched),
+      videoQuality,
+      videoFileLimit,
+    });
 
-      Object.assign(videoObject,{
-        VideoStartTime:this.startTime(video_object.startTime),
-        motion:this.getMotion(video_object.motion),
-        duration:duration,
-        audioMatched: this.getAudioMatched(option.audioMatched),
-        videoQuality,
-        videoFileLimit
-      })
-
-      /* Audio Object Filter */
-      let audioObject = this.urlFilter(audio_object.source);
-      Object.assign(audioObject,{
-        AudioStartTime:this.startTime(audio_object.startTime),
-      })
-      return new Promise((resolve, reject)=>{
-        RNAVEditing.audioVideoSpeedFilter(videoObject, audioObject,
-          (onError)=>{
-          reject(onError)
+    /* Audio Object Filter */
+    let audioObject = this.urlFilter(audioObjectFromOption.source);
+    Object.assign(audioObject, {
+      audioStartTime: this.startTime(audioObjectFromOption.startTime),
+    });
+    return new Promise((resolve, reject) => {
+      RNAVEditing.audioVideoSpeedFilter(
+        videoObject,
+        audioObject,
+        (onError) => {
+          reject(onError);
         },
         (results, file) => {
-              console.log(file);
-              resolve(file)
-            }
+          resolve(file);
+        }
       );
-      })
-      
+    });
   },
-  duration: function(videoDuration = 0.0, audioDuration = 0.0) {
+  duration: function (videoDuration = 0.0, audioDuration = 0.0) {
     let duration = 0.0;
-    if (videoDuration > audioDuration){
+    if (videoDuration > audioDuration) {
       duration = videoDuration;
-    }else {
+    } else {
       duration = audioDuration;
     }
     return duration;
   },
-  startTime:function(time = 0.0){
+  startTime: function (time = 0.0) {
     return time;
   },
-  getMotion:function(motion = 0){
+  getMotion: function (motion = 0) {
     return motion;
   },
-  getAudioMatched: function (audioMatched = true){
+  getAudioMatched: function (audioMatched = true) {
     return audioMatched;
   },
-  Add:function(){
+  Add: function () {
     return 78;
-  }
+  },
 };
 //
 VideoEditing.FILTER_SPEED_2X_FAST = 2;
